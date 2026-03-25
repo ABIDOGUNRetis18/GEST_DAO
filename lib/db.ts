@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import mysql from "mysql2/promise";
+import { Pool } from "pg";
 
 dotenv.config({ path: ".env.local" });
 
@@ -7,7 +7,7 @@ const DB_HOST = process.env.DB_HOST || "localhost";
 const DB_USER = process.env.DB_USER;
 const DB_PASSWORD = process.env.DB_PASSWORD || "";
 const DB_NAME = process.env.DB_NAME || "dao";
-const DB_PORT = Number(process.env.DB_PORT || 3306);
+const DB_PORT = Number(process.env.DB_PORT || 5432);
 
 if (!DB_USER) {
   throw new Error(
@@ -15,17 +15,15 @@ if (!DB_USER) {
   );
 }
 
-export const pool = mysql.createPool({
+export const pool = new Pool({
   host: DB_HOST,
   user: DB_USER,
   password: DB_PASSWORD,
   database: DB_NAME,
   port: DB_PORT,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 10000,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
 });
 
 export async function db() {
@@ -36,19 +34,17 @@ export async function verifyDatabaseStructure() {
   await _verifyDatabaseStructure(pool);
 }
 
-async function tableExists(connection: mysql.Pool, table: string) {
-  const [rows] = await connection.execute<mysql.RowDataPacket[]>(
-    `
-    SELECT TABLE_NAME
-    FROM information_schema.TABLES
-    WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
-    `,
-    [DB_NAME, table]
+async function tableExists(connection: Pool, table: string) {
+  const result = await connection.query(
+    `SELECT table_name
+     FROM information_schema.tables
+     WHERE table_schema = 'public' AND table_name = $1`,
+    [table]
   );
-  return rows.length > 0;
+  return result.rows.length > 0;
 }
 
-async function _verifyDatabaseStructure(connection: mysql.Pool) {
+async function _verifyDatabaseStructure(connection: Pool) {
   // 1) USERS d'abord (obligatoire pour les FK)
   const usersExists = await tableExists(connection, "users");
   if (!usersExists) {
