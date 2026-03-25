@@ -1,0 +1,150 @@
+# ══════════════════════════════════════════════════════════════
+# DOCKER COMPOSE — Production
+#
+# Le nom du projet est défini par COMPOSE_PROJECT_NAME dans .env
+# Il préfixe automatiquement tous les conteneurs, volumes et réseaux.
+# Pour renommer toute l'app : changer uniquement COMPOSE_PROJECT_NAME
+# ══════════════════════════════════════════════════════════════
+
+services:
+
+  # ── Application Next.js ───────────────────────────────────
+  app:
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile.working
+      args:
+        PORT: ${APP_PORT:-3000}
+    container_name: ${COMPOSE_PROJECT_NAME}-app
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${APP_PORT:-3000}:${APP_PORT:-3000}"
+    environment:
+      - NODE_ENV=production
+      - PORT=${APP_PORT:-3000}
+      - DB_HOST=${COMPOSE_PROJECT_NAME}-mysql
+      - DB_PORT=3306
+      - DB_USER=${MYSQL_USER:-dao_user}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+      - DB_NAME=${MYSQL_DATABASE:-dao_project}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_PORT=${EMAIL_PORT:-587}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAIL_FROM=${EMAIL_FROM}
+      - EMAIL_FROM_NAME=${EMAIL_FROM_NAME}
+      - EMAIL_SENDER=${EMAIL_SENDER}
+      - EMAIL_SENDER_NAME=${EMAIL_SENDER_NAME}
+      - EMAIL_RECEIVER=${EMAIL_RECEIVER}
+      - EMAIL_RECEIVER_NAME=${EMAIL_RECEIVER_NAME}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - uploads:/app/uploads
+      - logs:/app/logs
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: "1.0"
+        reservations:
+          memory: 128m
+          cpus: "0.25"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${APP_PORT:-3000}/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── Base de données MySQL ──────────────────────────────────
+  mysql:
+    env_file:
+      - .env
+    image: mysql:8.0
+    container_name: ${COMPOSE_PROJECT_NAME}-mysql
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${MYSQL_PORT:-3307}:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-dao_project}
+      - MYSQL_USER=${MYSQL_USER:-dao_user}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_CHARACTER_SET_SERVER=utf8mb4
+      - MYSQL_COLLATION_SERVER=utf8mb4_unicode_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - mysql-config:/etc/mysql/conf.d
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - internal
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --innodb-buffer-pool-size=256M
+      --max-connections=100
+      --slow-query-log=1
+      --slow-query-log-file=/var/log/mysql/slow.log
+      --long-query-time=2
+      --bind-address=0.0.0.0
+    deploy:
+      resources:
+        limits:
+          memory: 768m
+          cpus: "1.0"
+        reservations:
+          memory: 256m
+          cpus: "0.25"
+    healthcheck:
+      test:
+        [
+          "CMD", "mysqladmin", "ping",
+          "-h", "localhost",
+          "-u", "${MYSQL_USER:-dao_user}",
+          "-p${MYSQL_PASSWORD}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# ── Volumes persistants ────────────────────────────────────
+# Docker préfixe automatiquement avec COMPOSE_PROJECT_NAME
+# ex: dao-project_mysql-data, dao-project_uploads ...
+volumes:
+  mysql-data:
+    driver: local
+  mysql-config:
+    driver: local
+  uploads:
+    driver: local
+  logs:
+    driver: local
+
+# ── Réseau privé interne ───────────────────────────────────
+# Docker préfixe automatiquement avec COMPOSE_PROJECT_NAME
+# ex: dao-project_internal
+networks:
+  internal:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "${DOCKER_SUBNET:-172.25.0.0/24}"
+          gateway: "${DOCKER_GATEWAY:-172.25.0.1}"

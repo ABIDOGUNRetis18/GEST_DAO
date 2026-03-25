@@ -1,0 +1,10 @@
+{
+  "extends": ["plugin:security/recommended"],
+  "rules": {
+    "security/detect-object-injection": "warn",
+    "security/detect-possible-timing-attacks": "warn",
+    "security/detect-buffer-noassert": "error",
+    "no-eval": "error",
+    "no-implied-eval": "error"
+  }
+}

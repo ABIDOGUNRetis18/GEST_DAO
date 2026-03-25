@@ -1,0 +1,21 @@
+# Configuration de la base de données
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=dao_project
+
+# Configuration de l'application
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=votre_secret_key_ici
+
+# Configuration de l'email (très important pour les notifications)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=votre_email@gmail.com
+EMAIL_PASSWORD=votre_mot_de_passe_app
+EMAIL_FROM=noreply@dao-project.com
+EMAIL_FROM_NAME=DAO Project
+
+# Configuration de sécurité
+NODE_ENV=development

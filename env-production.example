@@ -1,0 +1,19 @@
+COMPOSE_PROJECT_NAME= # Nom du projet — préfixe conteneurs/volumes/réseaux
+APP_PORT= # Port app (ex: 3000)
+MYSQL_PORT= # Port MySQL hôte (ex: 3307)
+MYSQL_DATABASE= # DB MySQL
+MYSQL_USER= # User MySQL
+MYSQL_PASSWORD= # Password user MySQL (openssl rand -base64 16)
+MYSQL_ROOT_PASSWORD= # Password root MySQL (openssl rand -base64 16)
+NEXTAUTH_URL= # URL app (http://localhost:${APP_PORT})
+NEXTAUTH_SECRET= # Secret NextAuth (openssl rand -base64 32)
+EMAIL_HOST= # Serveur SMTP
+EMAIL_PORT= # Port SMTP (587=TLS, 465=SSL)
+EMAIL_USER= # Email SMTP
+EMAIL_PASSWORD= # Password SMTP
+EMAIL_FROM= # Email expéditeur
+EMAIL_FROM_NAME= # Nom expéditeur
+EMAIL_SENDER= # Email notifications système
+EMAIL_SENDER_NAME= # Nom notifications système
+EMAIL_RECEIVER= # Email admin (récepteur notifications)
+EMAIL_RECEIVER_NAME= # Nom admin

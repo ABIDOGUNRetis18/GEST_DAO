@@ -1,0 +1,71 @@
+/* Styles pour l'impression PDF - Version améliorée */
+@media print {
+  /* Masquer tous les éléments par défaut */
+  body * {
+    visibility: hidden;
+  }
+  
+  /* Afficher uniquement le contenu principal */
+  .print-area, .print-area * {
+    visibility: visible;
+  }
+  
+  /* Positionner le contenu pour l'impression */
+  .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 20px;
+  }
+  
+  /* Masquer explicitement les éléments non désirés */
+  .no-print,
+  header,
+  nav,
+  aside,
+  footer,
+  .sidebar,
+  .navigation,
+  .menu,
+  .button,
+  .btn,
+  [role="button"],
+  button,
+  input,
+  textarea,
+  select {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  /* Optimiser le contenu pour l'impression */
+  .print-area section {
+    break-inside: avoid;
+    margin-bottom: 20px;
+    page-break-inside: avoid;
+  }
+  
+  /* Styles pour le texte */
+  .print-area h1, .print-area h2, .print-area h3 {
+    color: #000 !important;
+    margin: 10px 0;
+  }
+  
+  .print-area p, .print-area span, .print-area div {
+    color: #000 !important;
+  }
+  
+  /* Masquer les bordures et arrière-plans */
+  .print-area * {
+    border-color: #000 !important;
+    background: white !important;
+    box-shadow: none !important;
+  }
+  
+  /* Optimiser les barres de progression pour l'impression */
+  .print-area [style*="width"] {
+    background: #f0f0f0 !important;
+    border: 1px solid #000 !important;
+  }
+}

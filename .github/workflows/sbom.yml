@@ -1,0 +1,85 @@
+name: SBOM — Software Bill of Materials
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  generate-sbom:
+    name: Générer le SBOM complet
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Installer les dépendances
+        run: npm ci --ignore-scripts
+
+      - name: Installer CycloneDX
+        run: npm install -g @cyclonedx/cyclonedx-npm
+
+      - name: Générer SBOM JSON
+        run: cyclonedx-npm --output-format JSON --output-file sbom.json
+
+      - name: Générer SBOM XML
+        run: cyclonedx-npm --output-format XML --output-file sbom.xml
+
+      - name: npm audit — CVE
+        run: |
+          npm audit --json > npm-audit.json || true
+          npm audit 2>&1 | tee npm-audit.txt || true
+
+      - name: npm outdated — versions obsolètes
+        run: |
+          npm outdated --json > npm-outdated.json || true
+          npm outdated 2>&1 | tee npm-outdated.txt || true
+
+      - name: Arbre de dépendances
+        run: |
+          npm list --all --json > dependency-tree.json || true
+          npm list --all 2>&1 | tee dependency-tree.txt || true
+
+      - name: Générer rapport HTML
+        run: python3 .github/scripts/sbom_report.py
+        env:
+          GIT_BRANCH: ${{ github.ref_name }}
+          GIT_SHA: ${{ github.sha }}
+
+      - name: Upload tous les rapports
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-complet-${{ github.sha }}
+          path: |
+            sbom.json
+            sbom.xml
+            npm-audit.json
+            npm-audit.txt
+            npm-outdated.json
+            npm-outdated.txt
+            dependency-tree.json
+            dependency-tree.txt
+            sbom-report.html
+          retention-days: 90
+        if: always()
+
+      - name: Résumé GitHub Actions
+        run: python3 .github/scripts/sbom_summary.py
+        env:
+          GITHUB_STEP_SUMMARY: ${{ env.GITHUB_STEP_SUMMARY }}
+        if: always()

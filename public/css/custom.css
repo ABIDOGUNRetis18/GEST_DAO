@@ -1,0 +1,77 @@
+/* Styles pour la sidebar fixe */
+.container-scroller {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.page-body-wrapper {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  padding-top: 70px; /* Hauteur du header */
+}
+
+.sidebar {
+  position: fixed;
+  top: 70px; /* Hauteur du header */
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  width: 260px; /* Largeur de la sidebar */
+  padding: 0;
+  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.05);
+  background: #fff;
+  transition: all 0.2s;
+  overflow-y: auto;
+}
+
+.main-panel {
+  flex: 1;
+  margin-left: 260px; /* Largeur de la sidebar */
+  width: calc(100% - 260px);
+  min-height: calc(100vh - 70px);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s;
+}
+
+.content-wrapper {
+  flex: 1;
+  padding: 20px 30px;
+  background-color: #f5f7ff;
+}
+
+/* Ajustements pour les écrans plus petits */
+@media (max-width: 991px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.sidebar-offcanvas {
+    transform: translateX(0);
+  }
+
+  .main-panel {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* Style de la barre de défilement pour la sidebar */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

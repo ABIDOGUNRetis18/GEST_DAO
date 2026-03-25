@@ -1,0 +1,358 @@
+@import "tailwindcss";
+
+/* ============================
+   IMPORTS DES CSS DU TEMPLATE MAJESTIC
+   TRÈS IMPORTANT - Ces fichiers doivent être dans votre dossier public/
+============================ */
+
+/* Vous devez avoir ces fichiers dans votre projet :
+   - public/vendors/mdi/css/materialdesignicons.min.css (icônes)
+   - public/vendors/base/vendor.bundle.base.css (Bootstrap + plugins)
+   - public/css/style.css (styles du template Majestic)
+*/
+
+/* Variables globales */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --primary: #0d6efd;
+  --secondary: #6c757d;
+  --error: #dc3545;
+  --light: #f8f9fa;
+  --border: #dee2e6;
+}
+
+/* ============================
+   AUTH LAYOUT (login only)
+============================ */
+.auth {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+}
+
+.auth-left {
+  width: 50%;
+  background-color: var(--light);
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-right {
+  width: 50%;
+  background-color: var(--background);
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================
+   FORM STYLES
+============================ */
+.icon-field {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.icon-field .icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--secondary);
+}
+
+.icon-field input {
+  padding-left: 3rem !important;
+  width: 100%;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--secondary);
+}
+
+.form-control {
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+  height: 3.5rem;
+}
+
+.form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  outline: none;
+}
+
+/* ============================
+   BUTTONS
+============================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  border: 1px solid transparent;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-outline-primary {
+  color: var(--primary);
+  border-color: var(--primary);
+  background-color: transparent;
+}
+
+.btn-outline-primary:hover {
+  color: #fff;
+  background-color: var(--primary);
+}
+
+/* ============================
+   UTILITIES
+============================ */
+.radius-12 {
+  border-radius: 0.75rem;
+}
+
+.h-56-px {
+  height: 3.5rem;
+}
+
+.max-w-464-px {
+  max-width: 29rem;
+  width: 100%;
+}
+
+.py-32 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.px-24 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.mb-12 {
+  margin-bottom: 0.75rem;
+}
+.mb-16 {
+  margin-bottom: 1rem;
+}
+.mb-20 {
+  margin-bottom: 1.25rem;
+}
+.mb-32 {
+  margin-bottom: 2rem;
+}
+.mb-40 {
+  margin-bottom: 2.5rem;
+}
+.mt-32 {
+  margin-top: 2rem;
+}
+
+.text-secondary-light {
+  color: var(--secondary);
+}
+.text-primary-600 {
+  color: var(--primary);
+}
+
+.bg-neutral-50 {
+  background-color: var(--light);
+}
+
+.d-flex {
+  display: flex !important;
+}
+.flex-wrap {
+  flex-wrap: wrap;
+}
+.flex-column {
+  flex-direction: column !important;
+}
+.justify-content-center {
+  justify-content: center !important;
+}
+.justify-content-between {
+  justify-content: space-between !important;
+}
+.align-items-center {
+  align-items: center !important;
+}
+
+/* ============================
+   CHECKBOXES
+============================ */
+.form-check {
+  display: flex;
+  align-items: center;
+}
+
+.form-check-input {
+  width: 1.25em;
+  height: 1.25em;
+  margin-right: 0.5rem;
+}
+
+.form-check-label {
+  font-size: 0.875rem;
+  color: var(--secondary);
+}
+
+/* ============================
+   ERROR STATES
+============================ */
+.invalid-feedback {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+  color: var(--error);
+}
+
+.is-invalid {
+  border-color: var(--error) !important;
+}
+
+/* ============================
+   SPINNER
+============================ */
+.spinner-border {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 0.2em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================
+   RESPONSIVE
+============================ */
+@media (max-width: 991.98px) {
+  .auth-left {
+    display: none;
+  }
+  .auth-right {
+    width: 100%;
+  }
+}
+
+/* ============================
+   DARK MODE
+============================ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --border: #2d3748;
+    --light: #1a202c;
+    --secondary: #a0aec0;
+  }
+}
+
+/* ============================
+   STYLE DU MENU (Sidebar)
+============================ */
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 12px 25px;
+  color: #9899ac;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all 0.3s;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border-left: 3px solid #3699ff;
+}
+
+/* Icônes */
+.menu-icon {
+  margin-right: 15px;
+  font-size: 1.25rem;
+  width: 24px;
+  text-align: center;
+  color: #6c7293;
+}
+
+.nav-link:hover .menu-icon,
+.nav-link.active .menu-icon {
+  color: #3699ff;
+}
+
+/* Sous-menu */
+.sub-menu {
+  padding-left: 20px;
+  display: none;
+}
+
+.nav-item.show .sub-menu {
+  display: block;
+}
+
+.menu-arrow {
+  margin-left: auto;
+  transition: transform 0.3s;
+}
+
+.nav-link[aria-expanded="true"] .menu-arrow {
+  transform: rotate(90deg);
+}
+
+:root {
+  --primary: #4b49ac;
+  --secondary: #7da0fa;
+  --light: #f8f9fa;
+  --dark: #2a2a2a;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  background-color: #f5f5f5;
+}
+
+.container-scroller {
+  min-height: 100vh;
+}
+
+.page-body-wrapper {
+  min-height: calc(100vh - 70px);
+  display: flex;
+  width: 100%;
+}
+
+.main-panel {
+  flex: 1;
+  transition: all 0.3s;
+}
+
+.content-wrapper {
+  padding: 1.5rem;
+  width: 100%;
+}

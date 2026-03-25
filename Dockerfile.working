@@ -1,0 +1,105 @@
+# ══════════════════════════════════════════════════════════════
+# DOCKERFILE — Next.js Production (Multi-stage)
+#
+# Stage 1 : deps     → installation des dépendances
+# Stage 2 : builder  → build de l'application Next.js
+# Stage 3 : runner   → image finale légère (prod uniquement)
+#
+# SÉCURITÉ :
+#   - Aucun secret réel passé en ARG ou ENV au build
+#   - Les vraies valeurs sont injectées au runtime via docker-compose
+#   - Utilisateur non-root (nextjs uid 1001)
+#   - Image finale basée sur node:20-alpine (surface d'attaque minimale)
+#
+# PORT configurable via .env → APP_PORT=XXXX (défaut : 3000)
+# ══════════════════════════════════════════════════════════════
+
+
+# ── Stage 1 : Installation des dépendances ───────────────────
+FROM node:20-alpine AS deps
+
+RUN apk add --no-cache libc6-compat
+
+WORKDIR /app
+
+COPY package.json package-lock.json* ./
+
+# Toutes les dépendances (prod + dev) pour le build
+RUN npm ci && npm cache clean --force
+RUN cp -r node_modules node_modules_all
+
+# Dépendances prod uniquement pour le runner final
+RUN npm ci --omit=dev && npm cache clean --force
+
+
+# ── Stage 2 : Build de l'application ─────────────────────────
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# ── Variables placeholder pour le build uniquement ───────────
+# Ces valeurs permettent à Next.js de collecter les pages sans
+# connexion réelle à la base de données.
+# Les VRAIES valeurs sont injectées au runtime par docker-compose.
+# Ne jamais mettre de credentials réels ici — ils seraient
+# visibles dans `docker history`.
+ENV DB_HOST=mysql
+ENV DB_PORT=3306
+ENV DB_USER=build_placeholder
+ENV DB_PASSWORD=build_placeholder
+ENV DB_NAME=dao
+ENV NEXTAUTH_URL=http://localhost:3000
+ENV NEXTAUTH_SECRET=build_placeholder_secret_minimum_32_characters_xx
+
+# Dépendances complètes depuis stage deps
+COPY --from=deps /app/node_modules_all ./node_modules
+
+# Code source (le .dockerignore exclut .env, .git, node_modules…)
+COPY . .
+
+RUN npm run build
+
+
+# ── Stage 3 : Image de production finale ─────────────────────
+FROM node:20-alpine AS runner
+
+ARG PORT=3000
+ENV PORT=$PORT
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+WORKDIR /app
+
+# curl pour le HEALTHCHECK
+RUN apk add --no-cache curl
+
+# Utilisateur non-root dédié
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 --ingroup nodejs nextjs
+
+# Artefacts du build uniquement — pas le code source complet
+COPY --from=builder --chown=nextjs:nodejs /app/public       ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next        ./.next
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+
+# Dépendances prod uniquement (image légère)
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
+
+# Répertoires d'écriture autorisés pour l'utilisateur nextjs
+RUN mkdir -p /app/uploads /app/logs && \
+    chown -R nextjs:nodejs /app/uploads /app/logs
+
+# Système de fichiers en lecture seule sauf volumes montés
+# (les volumes docker-compose montent /app/uploads et /app/logs)
+
+USER nextjs
+
+EXPOSE $PORT
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 --start-period=40s \
+  CMD curl -f http://localhost:$PORT/api/health || exit 1
+
+CMD ["sh", "-c", "npm run start -- -p $PORT"]

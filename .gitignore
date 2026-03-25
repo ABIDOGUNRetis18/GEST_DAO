@@ -1,0 +1,127 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Production builds
+.next/
+out/
+build/
+dist/
+
+# ── SECURITE — ne jamais committer ────────────────────────
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+private/
+
+# ── Uploads privés (hors public/) ─────────────────────────
+private/uploads/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+coverage/
+*.lcov
+.nyc_output
+
+# Cache
+.npm
+.eslintcache
+.stylelintcache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+.cache
+.parcel-cache
+.node_repl_history
+
+# TypeScript
+*.tsbuildinfo
+
+# Package managers
+*.tgz
+.yarn-integrity
+jspm_packages/
+yarn.lock
+pnpm-lock.yaml
+
+# Next.js
+.next/
+.nuxt/
+
+# Storybook
+.out/
+.storybook-out/
+
+# Temp
+tmp/
+temp/
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+test-connection.sql
+temp_user.sql
+test_login.json
+
+# Docker
+.dockerignore
+
+# Scripts de test
+test-docker.bat
+test-docker.sh
+fix-font-paths.ps1
+
+# Docs internes
+compte-rendu-recette.md
+guide.md
+README-SEEDS.md
+README-DOCKER.md
+
+# Rapports de sécurité (ne pas committer)
+npm-audit.json
+npm-outdated.json
+sbom-report.html
+nuclei-results.*
+rapport-nikto.*
+dependency-check-report/
+
+# Fichiers de build temporaires
+*.map
